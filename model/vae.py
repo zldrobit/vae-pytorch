@@ -24,19 +24,19 @@ class VAE(nn.Module):
         self.dec_tconv4 = nn.ConvTranspose2d(64, 1, 4, 2, padding=1, bias=False) # 32
 
     def encode(self, x):
-        x = F.leaky_relu(self.conv1(x), 0.1, inplace=True)
-        x = F.leaky_relu(self.bn2(self.conv2(x)), 0.1, inplace=True)
-        x = F.leaky_relu(self.bn3(self.conv3(x)), 0.1, inplace=True)
+        x = F.leaky_relu(self.enc_conv1(x), 0.1, inplace=True)
+        x = F.leaky_relu(self.enc_bn2(self.enc_conv2(x)), 0.1, inplace=True)
+        x = F.leaky_relu(self.enc_bn3(self.enc_conv3(x)), 0.1, inplace=True)
         x = x.view([-1, 1024])
-        return torch.distributions.normal.Normal(self.encode_mu(x), F.softplus(self.encode_logvar(x)))
+        return torch.distributions.normal.Normal(self.enc_mu(x), F.softplus(self.enc_logvar(x))) # latentD
 
     def decode(self, z):
-        z = z.view([-1, 1024, 1, 1])
-        x = F.relu(self.dec_bn1(self.dec_tconv1(z)))
-        x = F.relu(self.dec_bn2(self.dec_tconv2(z)))
-        x = F.relu(self.dec_bn3(self.dec_tconv3(z)))
+        z = z.view([-1, self.latentD, 1, 1])
+        z = F.relu(self.dec_bn1(self.dec_tconv1(z)))
+        z = F.relu(self.dec_bn2(self.dec_tconv2(z)))
+        z = F.relu(self.dec_bn3(self.dec_tconv3(z)))
 
-        img = torch.sigmoid(self.tconv4(x))
+        img = torch.sigmoid(self.dec_tconv4(z))
 
         return img
 

@@ -7,4 +7,6 @@ params = {
     'beta1': 0.5,
     'beta2': 0.999,
     'save_epoch' : 25,# After how many epochs to save checkpoints and generate test output.
-    'dataset' : 'MNIST'}# Dataset to use. Choose from {MNIST, SVHN, CelebA, FashionMNIST}. CASE MUST MATCH EXACTLY!!!!!
+    'dataset' : 'MNIST',# Dataset to use. Choose from {MNIST, SVHN, CelebA, FashionMNIST}. CASE MUST MATCH EXACTLY!!!!!
+    'recon_dir': 'recon', # Reconstruction Directory
+}
