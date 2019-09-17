@@ -9,5 +9,6 @@ params = {
     'save_epoch' : 25,# After how many epochs to save checkpoints and generate test output.
     'dataset' : 'MNIST',# Dataset to use. Choose from {MNIST, SVHN, CelebA, FashionMNIST}. CASE MUST MATCH EXACTLY!!!!!
     'recon_dir': 'recon', # Reconstruction Directory,
-    'dataset_dir': '/home/utiva/workspace/dataset/MNIST'
+    'dataset_dir': '/home/utiva/workspace/dataset/MNIST',
+    'valid_size': 100
 }
