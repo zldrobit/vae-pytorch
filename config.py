@@ -10,5 +10,6 @@ params = {
     'dataset' : 'MNIST',# Dataset to use. Choose from {MNIST, SVHN, CelebA, FashionMNIST}. CASE MUST MATCH EXACTLY!!!!!
     'recon_dir': 'recon', # Reconstruction Directory,
     'dataset_dir': '/home/utiva/workspace/dataset/MNIST',
-    'valid_size': 100
+    'valid_size': 100,
+    'save_path': 'save/checkpoint.pth'
 }

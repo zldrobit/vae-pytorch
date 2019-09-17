@@ -115,8 +115,13 @@ for epoch in range(params['num_epochs']):
     rand_samples = vutils.make_grid(imgs, nrow=10, padding=2, normalize=True)
     writer.add_image('Random Z', rand_samples, step)
 
-    # break
-#
-# save model?
-
-
+    if epoch % params['save_epoch'] == 0:
+        # save model
+        torch.save({
+                    # 'epoch': epoch,
+                    'model_state_dict': vae.state_dict(),
+                    'optimizer_state_dict': optimizer.state_dict(),
+                    'loss_tot': loss_tot,
+                    'loss_kl': loss_kl,
+                    'loss_rec': loss_rec,
+                    }, params['save_path'])
