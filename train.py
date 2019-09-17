@@ -14,14 +14,14 @@ import time
 from config import params
 from model import VAE
 
-device = 'cuda:4' if torch.cuda.is_available() else 'cpu'
+device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
 transform = transforms.Compose([
             transforms.Resize(28),
             transforms.CenterCrop(28),
             transforms.ToTensor()])
 
-dataset = torchvision.datasets.MNIST('/Users/robit/Dataset/MNIST', train=True, transform=transform, download=True)
+dataset = torchvision.datasets.MNIST(params['dataset_dir'], train=True, transform=transform, download=True)
 dataloader = torch.utils.data.DataLoader(dataset,
                                          batch_size=params['batch_size'],
                                          shuffle=True,
