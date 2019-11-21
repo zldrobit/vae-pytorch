@@ -5,6 +5,7 @@ from torch.utils.tensorboard import SummaryWriter
 import torchvision.utils as vutils
 from torch import optim
 import torch.nn.functional as F
+from apex import amp
 
 import os
 from tqdm import tqdm
@@ -55,6 +56,7 @@ p_z = torch.distributions.normal.Normal(
 
 optimizer = optim.Adam(vae.parameters(), lr=params['learning_rate'])
 
+vae, optimizer = amp.initialize(vae, optimizer, opt_level="O3", keep_batchnorm_fp32=True)
 if not os.path.exists(params['recon_dir']):
     os.makedirs(params['recon_dir'])
 else:
@@ -63,7 +65,7 @@ else:
 # Writer will output to ./runs/ directory by default
 writer = SummaryWriter()
 # print(sample_batch.shape)
-writer.add_graph(vae, sample_batch)
+# writer.add_graph(vae, sample_batch)
 writer.add_image('Train/Original', sample_batch_grid, 0)
 writer.add_image('Test/Original', test_batch_grid, 0)
 
@@ -80,15 +82,18 @@ for epoch in range(params['num_epochs']):
             step = i + epoch * len(dataloader)
             data = data.to(device)
             optimizer.zero_grad()
+
             # KL loss
             imgs, means, scales = vae(data)
             q_z = torch.distributions.normal.Normal(loc=means, scale=scales)
             loss_kl = torch.mean(torch.sum(torch.distributions.kl.kl_divergence(q_z, p_z), dim=[1]))
 
             # recon loss
-            loss_rec = torch.mean(torch.sum(F.binary_cross_entropy(imgs, data, reduction='none'), dim=[2, 3]))
+            loss_rec = torch.mean(torch.sum(F.mse_loss(imgs, data, reduction='none'), dim=[2, 3]))
             loss_tot = loss_kl + loss_rec
-            loss_tot.backward()
+            with amp.scale_loss(loss_tot, optimizer) as scaled_loss:
+                scaled_loss.backward()
+            # loss_tot.backward()
             optimizer.step()
             # print(loss_tot, loss_kl, loss_rec)
             desc = 'loss_tot: {:.3f}, loss_kl: {:.3f}, loss_rec: {:.3f}'.format(
@@ -101,6 +106,7 @@ for epoch in range(params['num_epochs']):
             writer.add_scalar('Loss/Total', loss_tot, step)
         
             # break
+    continue
     # output reconstruction
     vae.eval()
     imgs, *_ = vae(sample_batch)
